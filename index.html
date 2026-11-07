@@ -87,7 +87,10 @@ button:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
 @media (min-width:600px){.shot{margin:0;border-radius:4px}}
 .shot img{width:100%;height:100%;object-fit:contain;display:block;opacity:0;transition:opacity .25s}
 .shot img.ok{opacity:1}
-.shot .miss{position:absolute;inset:0;display:grid;place-items:center;padding:24px;text-align:center;color:var(--ink-soft);font-size:15px}
+.shot.duo{display:grid;grid-template-columns:1fr 1fr;gap:3px;background:none}
+.shot.duo .ph{position:relative;background:var(--wash);overflow:hidden;display:block;padding:0}
+.shot.duo .ph span{position:absolute;left:8px;bottom:8px;background:var(--paper);color:var(--ink);font-size:12px;font-weight:600;padding:3px 8px;border-radius:999px}
+.shot .miss{font-size:13px!important;position:absolute;inset:0;display:grid;place-items:center;padding:24px;text-align:center;color:var(--ink-soft);font-size:15px}
 .line{min-height:64px;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0}
 .ask{font-family:var(--serif);font-size:22px;line-height:1.15}
 .reveal{line-height:1.25}
@@ -136,8 +139,8 @@ button:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
 /* ——— Galerie ——— */
 .gallery{padding:20px 0 44px}
 .gallery h1{font-family:var(--serif);font-weight:400;font-size:46px;letter-spacing:-.02em;margin-bottom:18px}
-.tabs{display:flex;gap:8px;margin-bottom:22px;position:sticky;top:env(safe-area-inset-top,0px);background:var(--paper);padding:10px 0;z-index:2}
-.tab{border:1.5px solid var(--ink);border-radius:999px;padding:9px 18px;font-weight:600;font-size:15px}
+.tabs{display:flex;gap:8px;overflow-x:auto;margin-bottom:22px;position:sticky;top:env(safe-area-inset-top,0px);background:var(--paper);padding:10px 0;z-index:2}
+.tab{flex:none;border:1.5px solid var(--ink);border-radius:999px;padding:9px 18px;font-weight:600;font-size:15px}
 .tab.on{background:var(--ink);color:var(--paper)}
 .grid{list-style:none;display:grid;grid-template-columns:repeat(2,1fr);gap:18px 12px}
 @media (min-width:480px){.grid{grid-template-columns:repeat(3,1fr)}}
@@ -150,6 +153,8 @@ button:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
 .zoom b{font-family:var(--serif);font-weight:400;font-size:28px;display:block;margin-top:18px}
 .zoom i{color:var(--ink-soft)}
 .zoom p{margin-top:22px;font-size:14px;color:var(--ink-soft)}
+.zoom.two img{max-height:36vh}
+.zoom.two img + img{margin-top:8px}
 
 @media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
 </style>
@@ -167,16 +172,23 @@ const FISH = [
 ];
 
 const FLOWERS = [
-["Rose","Rosa","Rose","j"],["Pivoine","Paeonia lactiflora",0,"j"],["Hortensia","Hydrangea macrophylla",0,"j"],["Dahlia","Dahlia",0,"j"],["Chrysanthème","Chrysanthemum",0,"j"],["Œillet","Dianthus caryophyllus",0,"j"],["Lilas","Syringa vulgaris",0,"j"],["Lavande","Lavandula angustifolia",0,"j"],["Géranium","Pelargonium",0,"j"],["Bégonia","Begonia",0,"j"],["Pétunia","Petunia",0,"j"],["Souci","Calendula officinalis",0,"j"],["Œillet d’Inde","Tagetes erecta",0,"j"],["Zinnia","Zinnia elegans",0,"j"],["Cosmos","Cosmos bipinnatus",0,"j"],["Pensée","Viola × wittrockiana","Pansy","j"],["Glaïeul","Gladiolus",0,"j"],["Lupin","Lupinus polyphyllus",0,"j"],["Pied-d’alouette","Delphinium",0,"j"],["Rose trémière","Alcea rosea",0,"j"],["Capucine","Tropaeolum majus",0,"j"],["Pois de senteur","Lathyrus odoratus",0,"j"],["Glycine","Wisteria sinensis",0,"j"],["Clématite","Clematis",0,"j"],["Fuchsia","Fuchsia",0,"j"],["Gueule-de-loup","Antirrhinum majus",0,"j"],["Échinacée","Echinacea purpurea",0,"j"],["Rudbeckie","Rudbeckia hirta",0,"j"],["Hémérocalle","Hemerocallis fulva",0,"j"],["Agapanthe","Agapanthus praecox",0,"j"],["Phlox","Phlox paniculata",0,"j"],["Impatiente","Impatiens walleriana",0,"j"],["Pourpier","Portulaca grandiflora",0,"j"],["Sauge écarlate","Salvia splendens",0,"j"],["Gypsophile","Gypsophila paniculata",0,"j"],["Monarde","Monarda didyma",0,"j"],["Tritoma","Kniphofia uvaria",0,"j"],["Ancolie","Aquilegia vulgaris",0,"j"],["Camélia","Camellia japonica",0,"j"],["Magnolia","Magnolia grandiflora",0,"j"],["Rhododendron","Rhododendron",0,"j"],["Gerbera","Gerbera",0,"j"],["Alstroemère","Alstroemeria",0,"j"],["Lys","Lilium",0,"j"],["Lis tigré","Lilium lancifolium",0,"j"],["Iris","Iris germanica",0,"j"],["Jasmin","Jasminum officinale",0,"j"],["Pavot de Californie","Eschscholzia californica",0,"j"],["Ipomée","Ipomoea purpurea",0,"j"],["Ail d’ornement","Allium giganteum",0,"j"],["Tournesol","Helianthus annuus",0,"j"],["Fleur de cerisier","Prunus serrulata","Cherry blossom","j"],
+["Rose","Rosa","Rose","j"],["Pivoine","Paeonia lactiflora",0,"j"],["Hortensia","Hydrangea macrophylla",0,"j"],["Dahlia","Dahlia",0,"j"],["Chrysanthème","Chrysanthemum",0,"j"],["Œillet","Dianthus caryophyllus",0,"j"],["Lilas","Syringa vulgaris",0,"j"],["Lavande","Lavandula angustifolia",0,"j"],["Géranium","Pelargonium",0,"j"],["Bégonia","Begonia",0,"j"],["Pétunia","Petunia",0,"j"],["Souci","Calendula officinalis",0,"j"],["Œillet d’Inde","Tagetes erecta",0,"j"],["Zinnia","Zinnia elegans",0,"j"],["Cosmos","Cosmos bipinnatus",0,"j"],["Pensée","Viola × wittrockiana","Pansy","j"],["Glaïeul","Gladiolus",0,"j"],["Lupin","Lupinus polyphyllus",0,"j"],["Pied-d’alouette","Delphinium",0,"j"],["Rose trémière","Alcea rosea",0,"j"],["Capucine","Tropaeolum majus",0,"j"],["Pois de senteur","Lathyrus odoratus",0,"j"],["Glycine","Wisteria sinensis",0,"j"],["Clématite","Clematis",0,"j"],["Fuchsia","Fuchsia",0,"j"],["Gueule-de-loup","Antirrhinum majus",0,"j"],["Échinacée","Echinacea purpurea",0,"j"],["Rudbeckie","Rudbeckia hirta",0,"j"],["Hémérocalle","Hemerocallis fulva",0,"j"],["Agapanthe","Agapanthus praecox",0,"j"],["Phlox","Phlox paniculata",0,"j"],["Impatiente","Impatiens walleriana",0,"j"],["Pourpier","Portulaca grandiflora",0,"j"],["Sauge écarlate","Salvia splendens",0,"j"],["Gypsophile","Gypsophila paniculata",0,"j"],["Monarde","Monarda didyma",0,"j"],["Tritoma","Kniphofia uvaria",0,"j"],["Ancolie","Aquilegia vulgaris",0,"j"],["Camélia","Camellia japonica",0,"j"],["Magnolia de Soulange","Magnolia × soulangeana",0,"j"],["Rhododendron","Rhododendron",0,"j"],["Gerbera","Gerbera",0,"j"],["Alstroemère","Alstroemeria",0,"j"],["Lys","Lilium",0,"j"],["Lis tigré","Lilium lancifolium",0,"j"],["Iris","Iris germanica",0,"j"],["Jasmin","Jasminum officinale",0,"j"],["Pavot de Californie","Eschscholzia californica",0,"j"],["Ipomée","Ipomoea purpurea",0,"j"],["Ail d’ornement","Allium giganteum",0,"j"],["Tournesol","Helianthus annuus",0,"j"],["Fleur de cerisier","Prunus serrulata","Cherry blossom","j"],
 ["Tulipe","Tulipa",0,"b"],["Jonquille","Narcissus pseudonarcissus",0,"b"],["Jacinthe","Hyacinthus orientalis",0,"b"],["Crocus","Crocus vernus",0,"b"],["Perce-neige","Galanthus nivalis",0,"b"],["Muscari","Muscari armeniacum",0,"b"],["Fritillaire impériale","Fritillaria imperialis",0,"b"],["Anémone","Anemone coronaria",0,"b"],["Renoncule","Ranunculus asiaticus",0,"b"],["Freesia","Freesia",0,"b"],["Amaryllis","Hippeastrum",0,"b"],["Muguet","Convallaria majalis",0,"b"],["Cyclamen","Cyclamen persicum",0,"b"],["Rose de Noël","Helleborus niger",0,"b"],["Primevère","Primula vulgaris",0,"b"],
 ["Marguerite","Leucanthemum vulgare",0,"s"],["Coquelicot","Papaver rhoeas",0,"s"],["Bleuet","Centaurea cyanus",0,"s"],["Pissenlit","Taraxacum officinale",0,"s"],["Pâquerette","Bellis perennis",0,"s"],["Trèfle rouge","Trifolium pratense",0,"s"],["Bouton d’or","Ranunculus acris",0,"s"],["Achillée millefeuille","Achillea millefolium",0,"s"],["Myosotis","Myosotis sylvatica",0,"s"],["Violette odorante","Viola odorata",0,"s"],["Digitale pourpre","Digitalis purpurea",0,"s"],["Trille grandiflore","Trillium grandiflorum",0,"s"],["Iris versicolore","Iris versicolor",0,"s"],["Sabot de la Vierge","Cypripedium acaule",0,"s"],["Edelweiss","Leontopodium nivale",0,"s"],["Gentiane","Gentiana acaulis",0,"s"],["Bruyère","Calluna vulgaris",0,"s"],["Épilobe","Chamaenerion angustifolium",0,"s"],["Verge d’or","Solidago canadensis",0,"s"],["Chicorée sauvage","Cichorium intybus",0,"s"],["Nénuphar blanc","Nymphaea alba",0,"s"],
 ["Orchidée papillon","Phalaenopsis",0,"e"],["Hibiscus","Hibiscus rosa-sinensis",0,"e"],["Bougainvillier","Bougainvillea",0,"e"],["Oiseau de paradis","Strelitzia reginae",0,"e"],["Protéa royale","Protea cynaroides",0,"e"],["Arum","Zantedeschia aethiopica",0,"e"],["Anthurium","Anthurium andraeanum",0,"e"],["Frangipanier","Plumeria rubra",0,"e"],["Gardénia","Gardenia jasminoides",0,"e"],["Passiflore","Passiflora caerulea",0,"e"],["Lotus sacré","Nelumbo nucifera",0,"e"],["Mimosa","Acacia dealbata",0,"e"]
 ];
 
+// Arbres : groupe c = conifère (aiguilles), f = feuillu (feuilles)
+const TREES = [
+["Sapin baumier","Abies balsamea",0,"c"],["Épinette noire","Picea mariana",0,"c"],["Épinette blanche","Picea glauca",0,"c"],["Épinette rouge","Picea rubens",0,"c"],["Épinette bleue","Picea pungens",0,"c"],["Épinette de Sitka","Picea sitchensis",0,"c"],["Épinette d’Engelmann","Picea engelmannii",0,"c"],["Pin blanc","Pinus strobus",0,"c"],["Pin rouge","Pinus resinosa",0,"c"],["Pin gris","Pinus banksiana",0,"c"],["Pin rigide","Pinus rigida",0,"c"],["Pin ponderosa","Pinus ponderosa",0,"c"],["Pin tordu","Pinus contorta",0,"c"],["Pin à sucre","Pinus lambertiana",0,"c"],["Pin des marais","Pinus palustris",0,"c"],["Pin à encens","Pinus taeda",0,"c"],["Pin de Great Basin","Pinus longaeva",0,"c"],["Mélèze laricin","Larix laricina",0,"c"],["Mélèze occidental","Larix occidentalis",0,"c"],["Pruche du Canada","Tsuga canadensis",0,"c"],["Pruche de l’Ouest","Tsuga heterophylla",0,"c"],["Thuya occidental (cèdre blanc)","Thuja occidentalis",0,"c"],["Thuya géant","Thuja plicata",0,"c"],["Genévrier de Virginie","Juniperus virginiana",0,"c"],["Douglas","Pseudotsuga menziesii",0,"c"],["Séquoia toujours vert","Sequoia sempervirens",0,"c"],["Séquoia géant","Sequoiadendron giganteum",0,"c"],["Cyprès chauve","Taxodium distichum",0,"c"],["Sapin de Fraser","Abies fraseri",0,"c"],["Sapin grandissime","Abies grandis",0,"c"],["Sapin noble","Abies procera",0,"c"],["If du Canada","Taxus canadensis",0,"c"],["Cyprès de Nootka","Callitropsis nootkatensis",0,"c"],["Cyprès de Monterey","Hesperocyparis macrocarpa",0,"c"],
+["Érable à sucre","Acer saccharum",0,"f"],["Érable rouge","Acer rubrum",0,"f"],["Érable argenté","Acer saccharinum",0,"f"],["Érable noir","Acer nigrum",0,"f"],["Érable à Giguère","Acer negundo",0,"f"],["Érable de Pennsylvanie","Acer pensylvanicum",0,"f"],["Érable à épis","Acer spicatum",0,"f"],["Érable à grandes feuilles","Acer macrophyllum",0,"f"],["Bouleau à papier","Betula papyrifera",0,"f"],["Bouleau jaune","Betula alleghaniensis",0,"f"],["Bouleau gris","Betula populifolia",0,"f"],["Bouleau flexible","Betula lenta",0,"f"],["Chêne rouge","Quercus rubra",0,"f"],["Chêne blanc","Quercus alba",0,"f"],["Chêne à gros fruits","Quercus macrocarpa",0,"f"],["Chêne bicolore","Quercus bicolor",0,"f"],["Chêne des marais","Quercus palustris",0,"f"],["Chêne de Virginie","Quercus virginiana",0,"f"],["Chêne de Garry","Quercus garryana",0,"f"],["Hêtre à grandes feuilles","Fagus grandifolia",0,"f"],["Frêne blanc","Fraxinus americana",0,"f"],["Frêne noir","Fraxinus nigra",0,"f"],["Frêne rouge","Fraxinus pennsylvanica",0,"f"],["Peuplier faux-tremble","Populus tremuloides",0,"f"],["Peuplier à grandes dents","Populus grandidentata",0,"f"],["Peuplier deltoïde","Populus deltoides",0,"f"],["Peuplier baumier","Populus balsamifera",0,"f"],["Tilleul d’Amérique","Tilia americana",0,"f"],["Orme d’Amérique","Ulmus americana",0,"f"],["Orme rouge","Ulmus rubra",0,"f"],["Noyer noir","Juglans nigra",0,"f"],["Noyer cendré","Juglans cinerea",0,"f"],["Caryer ovale","Carya ovata",0,"f"],["Caryer cordiforme","Carya cordiformis",0,"f"],["Pacanier","Carya illinoinensis",0,"f"],["Cerisier tardif","Prunus serotina",0,"f"],["Cerisier de Virginie","Prunus virginiana",0,"f"],["Cerisier de Pennsylvanie","Prunus pensylvanica",0,"f"],["Sorbier d’Amérique","Sorbus americana",0,"f"],["Amélanchier arborescent","Amelanchier arborea",0,"f"],["Ostryer de Virginie","Ostrya virginiana",0,"f"],["Charme de Caroline","Carpinus caroliniana",0,"f"],["Micocoulier occidental","Celtis occidentalis",0,"f"],["Platane occidental","Platanus occidentalis",0,"f"],["Tulipier de Virginie","Liriodendron tulipifera",0,"f"],["Magnolia à grandes fleurs","Magnolia grandiflora",0,"f"],["Copalme d’Amérique","Liquidambar styraciflua",0,"f"],["Sassafras","Sassafras albidum",0,"f"],["Cornouiller fleuri","Cornus florida",0,"f"],["Gainier du Canada","Cercis canadensis",0,"f"],["Févier d’Amérique","Gleditsia triacanthos",0,"f"],["Robinier faux-acacia","Robinia pseudoacacia",0,"f"],["Catalpa","Catalpa speciosa",0,"f"],["Marronnier glabre","Aesculus glabra",0,"f"],["Saule noir","Salix nigra",0,"f"],["Aulne rouge","Alnus rubra",0,"f"],["Arbousier de Menzies","Arbutus menziesii",0,"f"],["Nyssa sylvestre","Nyssa sylvatica",0,"f"],["Plaqueminier de Virginie","Diospyros virginiana",0,"f"],["Asiminier trilobé","Asimina triloba",0,"f"],["Oranger des Osages","Maclura pomifera",0,"f"],["Mûrier rouge","Morus rubra",0,"f"],["Houx d’Amérique","Ilex opaca",0,"f"],["Sumac vinaigrier","Rhus typhina",0,"f"],["Palmier de Caroline","Sabal palmetto",0,"f"],["Arbre de Josué","Yucca brevifolia",0,"f"]
+];
+
 
 const QUIZZES = {
   fish:    {name:"Poissons", ask:"Quel est ce poisson ?", list:FISH},
-  flowers: {name:"Fleurs",   ask:"Quelle est cette fleur ?", list:FLOWERS}
+  flowers: {name:"Fleurs",   ask:"Quelle est cette fleur ?", list:FLOWERS},
+  trees:   {name:"Arbres",   ask:"Quel est cet arbre ?", list:TREES, duo:true}
 };
 const LENGTHS = [10, 25, 100];
 const PHOTO_CACHE = "photos-v1";
@@ -186,12 +198,18 @@ const app = document.getElementById("app");
 function load(key, fallback){ try{ const v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; }catch(e){ return fallback; } }
 function save(key, value){ try{ localStorage.setItem(key, JSON.stringify(value)); }catch(e){} }
 let photos = load("cdo-photos", {});      // titre Wikipédia → URL de la photo
+let leaves = load("cdo-leaves", {});      // arbres : titre → URL de la photo de la feuille
+let tried = new Set(load("cdo-tried", [])); // titres déjà cherchés
 let records = load("cdo-records", {});    // records[quiz][longueur]
 let cachedCount = 0;
 
 const titleOf = s => s[2] || s[1];
 const urlOf = s => photos[titleOf(s)] || null;
-const allSpecies = () => [...FISH, ...FLOWERS];
+const leafOf = s => leaves[titleOf(s)] || null;
+const allSpecies = () => [...FISH, ...FLOWERS, ...TREES];
+const leafLabel = s => s[3] === "c" ? "Aiguilles" : "Feuilles";
+const allUrls = () => [...new Set([...Object.values(photos), ...Object.values(leaves)])];
+const untried = () => allSpecies().map(titleOf).filter(t => !photos[t] && !tried.has(t));
 const esc = t => String(t).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const shuffle = a => { a = a.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; };
 
@@ -217,8 +235,78 @@ function hydrate(root){
 }
 
 /* ——— Photos : recherche sur Wikipédia puis mise en cache ——— */
+const API = "https://en.wikipedia.org/w/api.php?action=query&format=json&formatversion=2&origin=*&redirects=1";
+function follow(q){
+  const step = {};
+  (q.normalized||[]).forEach(n => step[n.from] = n.to);
+  (q.redirects||[]).forEach(r => step[r.from] = r.to);
+  return t => { let cur = t, guard = 0; while(step[cur] && guard++ < 4) cur = step[cur]; return cur; };
+}
+
+const LEAF = /(leaf|leaves|foliage|needle|feuill|aiguill|frond|branchlet|twig|shoot)/i;
+const TREE = /(tree|habit|arbre|whole|specimen|trunk|grove|forest|stand|park|autumn|fall|winter|old)/i;
+const BAD  = /(\bmaps?\b|\brange\b|distribution|logo|icon|illustration|drawing|\bplates?\b|herbari|lumber|cross.?section|seedling|stamp|chart|diagram|\bwood\b|\.svg|\.gif|\.tiff?)/i;
+const PHOTO = /\.(jpe?g|png|webp)$/i;
+const strongLeaf = /(leaf|leaves|needle|foliage|feuill|aiguill)/i;
+
+async function resolveTrees(){
+  const todo = TREES.map(titleOf).filter(t => !photos[t] && !tried.has(t));
+  const info = {}; // titre → {lead, leadThumb, files:[]}
+  for(let i=0; i<todo.length; i+=15){
+    const chunk = todo.slice(i, i+15);
+    let cont = {}, pages = {}, resolve = null;
+    for(let guard=0; guard<20; guard++){
+      const url = API + "&prop=pageimages|images&piprop=name|thumbnail&pithumbsize=500&imlimit=max&titles="
+        + encodeURIComponent(chunk.join("|")) + Object.entries(cont).map(([k,v]) => "&"+k+"="+encodeURIComponent(v)).join("");
+      const data = await (await fetch(url)).json();
+      const q = data.query || {};
+      if(!resolve) resolve = follow(q);
+      (q.pages||[]).forEach(pg => {
+        const x = pages[pg.title] = pages[pg.title] || {files:[]};
+        if(pg.pageimage) x.lead = "File:" + pg.pageimage.replace(/_/g," ");
+        if(pg.thumbnail) x.leadThumb = pg.thumbnail.source;
+        (pg.images||[]).forEach(im => x.files.push(im.title));
+      });
+      if(!data.continue) break;
+      cont = data.continue;
+    }
+    chunk.forEach(t => { const x = pages[resolve(t)]; if(x) info[t] = x; });
+  }
+
+  // Choix des deux photos
+  const need = new Set(), pick = {};
+  Object.entries(info).forEach(([t,x]) => {
+    const ok = x.files.filter(f => PHOTO.test(f) && !BAD.test(f));
+    let tree = x.lead && !LEAF.test(x.lead) ? x.lead : (ok.find(f => TREE.test(f) && !LEAF.test(f)) || x.lead);
+    let leaf = ok.find(f => strongLeaf.test(f) && f !== tree) || ok.find(f => LEAF.test(f) && f !== tree) || null;
+    pick[t] = {tree, leaf, leadThumb: x.lead === tree ? x.leadThumb : null};
+    if(tree && !pick[t].leadThumb) need.add(tree);
+    if(leaf) need.add(leaf);
+  });
+
+  // Adresses des miniatures
+  const thumbs = {}, files = [...need];
+  for(let i=0; i<files.length; i+=40){
+    const chunk = files.slice(i, i+40);
+    const data = await (await fetch(API + "&prop=imageinfo&iiprop=url&iiurlwidth=500&titles=" + encodeURIComponent(chunk.join("|")))).json();
+    const q = data.query || {}, resolve = follow(q), by = {};
+    (q.pages||[]).forEach(pg => { const ii = pg.imageinfo && pg.imageinfo[0]; if(ii) by[pg.title] = ii.thumburl || ii.url; });
+    chunk.forEach(f => { const u = by[resolve(f)]; if(u) thumbs[f] = u; });
+  }
+
+  todo.forEach(t => {
+    tried.add(t);
+    const k = pick[t]; if(!k) return;
+    const treeUrl = k.leadThumb || thumbs[k.tree];
+    if(treeUrl) photos[t] = treeUrl;
+    if(k.leaf && thumbs[k.leaf] && thumbs[k.leaf] !== treeUrl) leaves[t] = thumbs[k.leaf];
+  });
+  save("cdo-photos", photos); save("cdo-leaves", leaves); save("cdo-tried", [...tried]);
+}
+
 async function resolvePhotos(){
-  const missing = allSpecies().map(titleOf).filter(t => !photos[t]);
+  const treeTitles = new Set(TREES.map(titleOf));
+  const missing = [...FISH, ...FLOWERS].map(titleOf).filter(t => !photos[t] && !tried.has(t));
   for(let i=0; i<missing.length; i+=45){
     const chunk = missing.slice(i, i+45);
     const url = "https://en.wikipedia.org/w/api.php?action=query&format=json&formatversion=2&origin=*&redirects=1"
@@ -234,9 +322,11 @@ async function resolvePhotos(){
       let cur = t, guard = 0;
       while(step[cur] && guard++ < 4) cur = step[cur];
       if(byTitle[cur]) photos[t] = byTitle[cur];
+      tried.add(t);
     });
-    save("cdo-photos", photos);
+    save("cdo-photos", photos); save("cdo-tried", [...tried]);
   }
+  await resolveTrees();
 }
 
 async function countCached(){
@@ -244,7 +334,7 @@ async function countCached(){
   try{
     const cache = await caches.open(PHOTO_CACHE);
     const keys = new Set((await cache.keys()).map(r => r.url));
-    return Object.values(photos).filter(u => keys.has(u)).length;
+    return allUrls().filter(u => keys.has(u)).length;
   }catch(e){ return 0; }
 }
 
@@ -258,7 +348,7 @@ async function downloadAll(){
   try{
     say("Recherche des photos…");
     await resolvePhotos();
-    const urls = [...new Set(Object.values(photos))];
+    const urls = allUrls();
     const cache = await caches.open(PHOTO_CACHE);
     const have = new Set((await cache.keys()).map(r => r.url));
     let done = urls.filter(u => have.has(u)).length;
@@ -294,8 +384,8 @@ function bestFor(qid){
 
 function renderHome(openId){
   const total = allSpecies().length;
-  const known = Object.keys(photos).length;
-  const ready = cachedCount >= known && known > 0;
+  const known = allUrls().length;
+  const ready = cachedCount >= known && known > 0 && untried().length === 0;
   const shelf = Object.entries(QUIZZES).map(([id,q]) => {
     const withPhoto = q.list.filter(urlOf);
     const peek = withPhoto.length ? urlOf(withPhoto[Math.floor(Math.random()*withPhoto.length)]) : "";
@@ -317,7 +407,7 @@ function renderHome(openId){
   if(ready){
     offline = `<div class="offline"><strong>Prêt hors ligne</strong>${cachedCount} photos sont enregistrées sur ton téléphone.</div>`;
   }else{
-    offline = `<div class="offline"><strong>Photos à télécharger</strong><span data-status>Une seule fois, avec le wifi : environ 8 Mo. Ensuite, l’app marche sans connexion.</span>
+    offline = `<div class="offline"><strong>Photos à télécharger</strong><span data-status>Avec le wifi : environ 15 Mo. Ensuite, l’app marche sans connexion.</span>
       <div class="bar"><i style="width:${known?cachedCount/known*100:0}%"></i></div>
       <button class="dl" data-dl>Télécharger les photos</button></div>`;
   }
@@ -352,7 +442,14 @@ function startGame(qid, n){
 
 function preload(i){
   const r = game.rounds[i];
-  if(r) srcFor(urlOf(r.sp));
+  if(r){ srcFor(urlOf(r.sp)); if(leafOf(r.sp)) srcFor(leafOf(r.sp)); }
+}
+function shotHtml(sp, duo){
+  if(duo && leafOf(sp)) return `<figure class="shot duo">
+      <button class="ph" data-big="0"><img data-u="${esc(urlOf(sp))}" alt="Photo de l’arbre"><span>Arbre</span></button>
+      <button class="ph" data-big="1"><img data-u="${esc(leafOf(sp))}" alt="Photo des ${leafLabel(sp).toLowerCase()}"><span>${leafLabel(sp)}</span></button>
+    </figure>`;
+  return `<figure class="shot"><img data-u="${esc(urlOf(sp))}" alt="Photo à identifier"></figure>`;
 }
 
 function renderRound(){
@@ -377,22 +474,31 @@ function renderRound(){
     <div class="top"><button class="quit" data-quit>Quitter</button>
       <span>${g.streak>=2?`<span class="streak">Série de ${g.streak}</span>`:""}<span class="count">${g.i+1} / ${g.rounds.length}</span></span></div>
     <div class="progress"><i style="width:${(g.i + (answered?1:0))/g.rounds.length*100}%"></i></div>
-    <figure class="shot"><img alt="Photo à identifier"></figure>
+    ${shotHtml(r.sp, q.duo)}
     <div class="line">${line}</div>
     <ol class="choices">${choices}</ol>
   </div>`;
 
-  const img = app.querySelector(".shot img");
-  const shown = () => img.classList.add("ok");
-  img.addEventListener("load", shown);
-  if(img.complete && img.naturalWidth) shown();
-  img.addEventListener("error", () => {
-    if(!img.isConnected) return;
-    img.remove();
-    app.querySelector(".shot").insertAdjacentHTML("beforeend", `<div class="miss">Cette photo n’est pas encore sur ton téléphone. Reviens à l’accueil et télécharge les photos avec le wifi.</div>`);
+  app.querySelectorAll(".shot img").forEach(img => {
+    img.addEventListener("load", () => img.classList.add("ok"));
+    img.addEventListener("error", () => {
+      if(!img.isConnected) return;
+      const box = img.parentElement; img.remove();
+      box.insertAdjacentHTML("beforeend", `<div class="miss">Photo pas encore sur ton téléphone. Télécharge les photos depuis l’accueil, avec le wifi.</div>`);
+    });
+    srcFor(img.dataset.u).then(u => { img.src = u; });
   });
-  srcFor(urlOf(r.sp)).then(u => { img.src = u; });
   preload(g.i + 1);
+}
+
+function bigPhoto(urls, caption){
+  const el = document.createElement("div");
+  el.className = "zoom"; el.setAttribute("role","dialog");
+  el.innerHTML = urls.map(u => `<img data-src="${esc(u)}" alt="">`).join("") + (caption||"") + `<p>Touche n’importe où pour fermer.</p>`;
+  if(urls.length > 1) el.classList.add("two");
+  el.addEventListener("click", () => el.remove());
+  document.body.appendChild(el);
+  hydrate(el);
 }
 
 function pick(k){
@@ -462,12 +568,7 @@ function renderGallery(){
 }
 function zoom(k){
   const s = QUIZZES[galleryTab].list[k];
-  const el = document.createElement("div");
-  el.className = "zoom"; el.setAttribute("role","dialog");
-  el.innerHTML = `<img data-src="${esc(urlOf(s))}" alt="${esc(s[0])}"><b>${esc(s[0])}</b><i>${esc(s[1])}</i><p>Touche n’importe où pour fermer.</p>`;
-  el.addEventListener("click", () => el.remove());
-  document.body.appendChild(el);
-  hydrate(el);
+  bigPhoto([urlOf(s), leafOf(s)].filter(Boolean), `<b>${esc(s[0])}</b><i>${esc(s[1])}</i>`);
 }
 
 /* ——— Records ——— */
@@ -506,6 +607,7 @@ app.addEventListener("click", e => {
   else if("gallery" in t.dataset){ renderGallery(); window.scrollTo(0,0); }
   else if(t.dataset.tab){ galleryTab = t.dataset.tab; renderGallery(); window.scrollTo(0,0); }
   else if(t.dataset.zoom !== undefined) zoom(+t.dataset.zoom);
+  else if(t.dataset.big !== undefined){ const r = game.rounds[game.i]; bigPhoto([t.dataset.big === "0" ? urlOf(r.sp) : leafOf(r.sp)]); }
   else if("reset" in t.dataset){ if(confirm("Effacer tous les records ?")){ records = {}; save("cdo-records", records); renderRecords(); } }
   else if("dl" in t.dataset){ t.disabled = true; t.textContent = "En cours…"; downloadAll(); }
 });
