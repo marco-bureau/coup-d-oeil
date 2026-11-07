@@ -1,0 +1,456 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Coup d’œil</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Coup d’œil">
+<meta name="theme-color" content="#F3F5EF" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0F2B23" media="(prefers-color-scheme: dark)">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Public+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#F3F5EF;
+  --ink:#143A2F;
+  --ink-soft:rgba(20,58,47,.64);
+  --line:rgba(20,58,47,.16);
+  --wash:rgba(20,58,47,.055);
+  --serif:"Young Serif", Georgia, "Times New Roman", serif;
+  --sans:"Public Sans", -apple-system, "Helvetica Neue", Arial, sans-serif;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --paper:#0F2B23;
+    --ink:#E8EEE5;
+    --ink-soft:rgba(232,238,229,.66);
+    --line:rgba(232,238,229,.16);
+    --wash:rgba(232,238,229,.06);
+    color-scheme: dark;
+  }
+}
+*{box-sizing:border-box;margin:0;padding:0}
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html,body{height:100%}
+body{background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.45;-webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent;overscroll-behavior:none}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;touch-action:manipulation}
+button:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
+#app{max-width:560px;margin:0 auto;min-height:100%;padding:0 22px}
+
+/* ——— Accueil ——— */
+.mast{padding:44px 0 34px}
+.mast h1{font-family:var(--serif);font-weight:400;font-size:21px;letter-spacing:.01em}
+.mast p{color:var(--ink-soft);margin-top:4px;font-size:16px}
+
+.shelf{list-style:none;border-top:1.5px solid var(--ink)}
+.shelf>li{border-bottom:1px solid var(--line)}
+.vol{display:grid;grid-template-columns:1fr auto;align-items:end;gap:16px;width:100%;text-align:left;padding:26px 0 22px}
+.vol-name{font-family:var(--serif);font-size:clamp(46px,15vw,72px);line-height:.92;letter-spacing:-.025em;display:block}
+.vol-sub{display:block;margin-top:12px;color:var(--ink-soft);font-size:15px}
+.vol-sub b{color:var(--ink);font-weight:600}
+.peek{width:72px;height:90px;object-fit:cover;border-radius:3px;background:var(--wash);display:block}
+.peek.empty{display:none}
+
+.lengths{display:none;padding:0 0 24px}
+.shelf>li.open .lengths{display:block;animation:drop .22s ease-out}
+@keyframes drop{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+.lengths p{font-size:14px;color:var(--ink-soft);margin-bottom:10px}
+.len-row{display:flex;gap:8px}
+.len{flex:1;border:1.5px solid var(--ink);border-radius:999px;padding:12px 6px;font-weight:600;font-size:15px}
+.len.main{background:var(--ink);color:var(--paper)}
+.len:active{transform:scale(.97)}
+
+.foot{padding:34px 0 40px;display:flex;flex-direction:column;gap:22px}
+.offline{font-size:15px;color:var(--ink-soft);max-width:36ch}
+.offline strong{color:var(--ink);font-weight:600;display:block;margin-bottom:2px}
+.dl{margin-top:12px;border:1.5px solid var(--ink);border-radius:999px;padding:11px 20px;font-weight:600;font-size:15px}
+.bar{height:3px;background:var(--line);margin-top:12px;border-radius:2px;overflow:hidden;max-width:280px}
+.bar i{display:block;height:100%;background:var(--ink);width:0;transition:width .2s}
+.link{align-self:flex-start;font-weight:600;font-size:15px;text-decoration:underline;text-underline-offset:4px;text-decoration-thickness:1.5px}
+
+/* ——— Partie ——— */
+.play{display:flex;flex-direction:column;min-height:100vh;min-height:100dvh;padding-bottom:18px}
+.top{display:flex;justify-content:space-between;align-items:center;height:52px;font-size:15px}
+.top .quit{color:var(--ink-soft);padding:8px 0}
+.top .count{font-variant-numeric:tabular-nums;font-weight:600}
+.top .streak{color:var(--ink-soft);margin-right:14px;font-weight:400}
+.progress{height:2px;background:var(--line);margin-bottom:14px}
+.progress i{display:block;height:100%;background:var(--ink);transition:width .3s}
+.shot{position:relative;margin:0 -22px;height:min(44vh,400px);background:var(--wash);overflow:hidden}
+@media (min-width:600px){.shot{margin:0;border-radius:4px}}
+.shot img{width:100%;height:100%;object-fit:cover;display:block;opacity:0;transition:opacity .25s}
+.shot img.ok{opacity:1}
+.shot .miss{position:absolute;inset:0;display:grid;place-items:center;padding:24px;text-align:center;color:var(--ink-soft);font-size:15px}
+.line{min-height:64px;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0}
+.ask{font-family:var(--serif);font-size:22px;line-height:1.15}
+.reveal{line-height:1.25}
+.reveal b{font-family:var(--serif);font-weight:400;font-size:20px;display:block}
+.reveal i{color:var(--ink-soft);font-size:14px}
+.next{flex:none;background:var(--ink);color:var(--paper);border-radius:999px;padding:11px 18px;font-weight:600;font-size:15px}
+.choices{list-style:none;display:flex;flex-direction:column;gap:7px}
+.choice{width:100%;text-align:left;min-height:50px;padding:12px 16px;border-radius:12px;border:1.5px solid var(--line);font-size:17px;display:flex;justify-content:space-between;align-items:center;gap:10px;transition:background .15s,color .15s,border-color .15s}
+.choice:active{background:var(--wash)}
+.choice.right{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.choice.wrong{color:var(--ink-soft);border-color:var(--ink-soft);border-style:dashed}
+.choice.wrong span:first-child{text-decoration:line-through;text-decoration-thickness:1.5px}
+.choice.dim{opacity:.45}
+.choice .mark{font-size:14px;font-weight:600;flex:none}
+
+/* ——— Résultat ——— */
+.result{padding:56px 0 40px}
+.score{font-family:var(--serif);font-size:clamp(120px,42vw,190px);line-height:.8;letter-spacing:-.04em}
+.score-of{font-family:var(--serif);font-size:28px;margin-top:10px}
+.verdict{margin-top:14px;color:var(--ink-soft);max-width:34ch}
+.verdict b{color:var(--ink);font-weight:600}
+.actions{display:flex;gap:10px;margin:30px 0 44px}
+.actions button{flex:1;border:1.5px solid var(--ink);border-radius:999px;padding:13px 8px;font-weight:600;font-size:15px}
+.actions .main{background:var(--ink);color:var(--paper)}
+.review h2,.records h2{font-family:var(--serif);font-weight:400;font-size:24px;margin-bottom:14px}
+.review ul{list-style:none;border-top:1px solid var(--line)}
+.review li{display:grid;grid-template-columns:56px 1fr;gap:14px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}
+.review img{width:56px;height:56px;object-fit:cover;border-radius:3px;background:var(--wash);display:block}
+.review b{font-weight:600;display:block}
+.review span{font-size:14px;color:var(--ink-soft)}
+.allgood{color:var(--ink-soft)}
+
+/* ——— Records ——— */
+.records{padding:20px 0 44px}
+.back{color:var(--ink-soft);font-size:15px;padding:12px 0 24px}
+.records h1{font-family:var(--serif);font-weight:400;font-size:46px;letter-spacing:-.02em;margin-bottom:32px}
+.records section{margin-bottom:38px}
+.records table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
+.records th{text-align:left;font-weight:400;font-size:13px;color:var(--ink-soft);padding:0 0 8px;border-bottom:1.5px solid var(--ink)}
+.records td{padding:12px 0;border-bottom:1px solid var(--line)}
+.records td:first-child{font-weight:600}
+.records th:not(:first-child),.records td:not(:first-child){text-align:right}
+.history{margin-top:14px;font-size:14px;color:var(--ink-soft)}
+.reset{font-size:14px;color:var(--ink-soft);text-decoration:underline;text-underline-offset:3px}
+
+@media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<main id="app"></main>
+<script>
+// [nom français, nom latin, titre Wikipédia (anglais) si différent du latin, groupe]
+const FISH = [
+["Saumon atlantique","Salmo salar",0,"d"],["Truite arc-en-ciel","Oncorhynchus mykiss",0,"d"],["Omble de fontaine","Salvelinus fontinalis",0,"d"],["Truite brune","Salmo trutta",0,"d"],["Grand brochet","Esox lucius",0,"d"],["Doré jaune","Sander vitreus",0,"d"],["Perchaude","Perca flavescens",0,"d"],["Achigan à petite bouche","Micropterus dolomieu",0,"d"],["Achigan à grande bouche","Micropterus salmoides",0,"d"],["Maskinongé","Esox masquinongy",0,"d"],["Barbotte brune","Ameiurus nebulosus",0,"d"],["Barbue de rivière","Ictalurus punctatus",0,"d"],["Carpe commune","Cyprinus carpio",0,"d"],["Crapet-soleil","Lepomis gibbosus",0,"d"],["Crapet arlequin","Lepomis macrochirus",0,"d"],["Esturgeon jaune","Acipenser fulvescens",0,"d"],["Anguille d’Amérique","Anguilla rostrata",0,"d"],["Touladi","Salvelinus namaycush",0,"d"],["Omble chevalier","Salvelinus alpinus",0,"d"],["Grand corégone","Coregonus clupeaformis",0,"d"],["Lotte","Lota lota",0,"d"],["Silure glane","Silurus glanis",0,"d"],["Sandre","Sander lucioperca",0,"d"],["Perche commune","Perca fluviatilis",0,"d"],["Tanche","Tinca tinca",0,"d"],["Éperlan arc-en-ciel","Osmerus mordax",0,"d"],["Saumon coho","Oncorhynchus kisutch",0,"d"],["Saumon chinook","Oncorhynchus tshawytscha",0,"d"],["Tilapia du Nil","Oreochromis niloticus",0,"d"],
+["Morue de l’Atlantique","Gadus morhua",0,"m"],["Aiglefin","Melanogrammus aeglefinus",0,"m"],["Merlu européen","Merluccius merluccius",0,"m"],["Flétan atlantique","Hippoglossus hippoglossus",0,"m"],["Plie","Pleuronectes platessa",0,"m"],["Sole commune","Solea solea",0,"m"],["Turbot","Scophthalmus maximus",0,"m"],["Thon rouge","Thunnus thynnus",0,"m"],["Thon albacore","Thunnus albacares",0,"m"],["Maquereau","Scomber scombrus",0,"m"],["Hareng atlantique","Clupea harengus",0,"m"],["Sardine","Sardina pilchardus",0,"m"],["Anchois","Engraulis encrasicolus",0,"m"],["Espadon","Xiphias gladius",0,"m"],["Bar commun","Dicentrarchus labrax",0,"m"],["Daurade royale","Sparus aurata",0,"m"],["Rouget de roche","Mullus surmuletus",0,"m"],["Baudroie","Lophius piscatorius",0,"m"],["Saint-Pierre","Zeus faber",0,"m"],["Raie bouclée","Raja clavata",0,"m"],["Capelan","Mallotus villosus",0,"m"],["Coryphène","Coryphaena hippurus",0,"m"],["Marlin bleu","Makaira nigricans",0,"m"],["Voilier","Istiophorus platypterus",0,"m"],["Poisson-lune","Mola mola",0,"m"],["Barracuda","Sphyraena barracuda",0,"m"],["Mérou géant","Epinephelus itajara",0,"m"],["Loup atlantique","Anarhichas lupus",0,"m"],
+["Grand requin blanc","Carcharodon carcharias",0,"q"],["Requin-baleine","Rhincodon typus",0,"q"],["Requin-marteau halicorne","Sphyrna lewini",0,"q"],["Requin-tigre","Galeocerdo cuvier",0,"q"],["Requin bleu","Prionace glauca",0,"q"],["Raie manta","Mobula birostris",0,"q"],["Requin pèlerin","Cetorhinus maximus",0,"q"],["Requin mako","Isurus oxyrinchus",0,"q"],
+["Poisson-clown","Amphiprion ocellaris",0,"r"],["Chirurgien bleu","Paracanthurus hepatus",0,"r"],["Poisson-ange empereur","Pomacanthus imperator",0,"r"],["Poisson-papillon à bec","Chelmon rostratus",0,"r"],["Baliste Picasso","Rhinecanthus aculeatus",0,"r"],["Poisson-globe","Arothron hispidus",0,"r"],["Rascasse volante","Pterois volitans",0,"r"],["Poisson-pierre","Synanceia verrucosa",0,"r"],["Hippocampe","Hippocampus","Seahorse","r"],["Murène verte","Gymnothorax funebris",0,"r"],["Poisson-perroquet","Sparisoma viride",0,"r"],["Chirurgien jaune","Zebrasoma flavescens",0,"r"],["Idole des Maures","Zanclus cornutus",0,"r"],["Poisson-coffre jaune","Ostracion cubicus",0,"r"],["Poisson-mandarin","Synchiropus splendidus",0,"r"],
+["Guppy","Poecilia reticulata",0,"a"],["Néon","Paracheirodon innesi",0,"a"],["Combattant","Betta splendens",0,"a"],["Scalaire","Pterophyllum scalare",0,"a"],["Discus","Symphysodon aequifasciatus",0,"a"],["Platy","Xiphophorus maculatus",0,"a"],["Porte-épée","Xiphophorus hellerii",0,"a"],["Molly","Poecilia sphenops",0,"a"],["Danio zèbre","Danio rerio",0,"a"],["Corydoras bronze","Corydoras aeneus",0,"a"],["Pléco","Pterygoplichthys pardalis",0,"a"],["Barbu de Sumatra","Puntigrus tetrazona",0,"a"],["Oscar","Astronotus ocellatus",0,"a"],["Gourami nain","Trichogaster lalius",0,"a"],["Piranha rouge","Pygocentrus nattereri",0,"a"],["Arowana argenté","Osteoglossum bicirrhosum",0,"a"],["Poisson rouge","Carassius auratus",0,"a"],["Carpe koï","Cyprinus rubrofuscus","Koi","a"],["Loche-clown","Chromobotia macracanthus",0,"a"],["Cichlidé jaune","Labidochromis caeruleus",0,"a"]
+];
+
+const FLOWERS = [
+["Rose","Rosa","Rose","j"],["Pivoine","Paeonia lactiflora",0,"j"],["Hortensia","Hydrangea macrophylla",0,"j"],["Dahlia","Dahlia",0,"j"],["Chrysanthème","Chrysanthemum",0,"j"],["Œillet","Dianthus caryophyllus",0,"j"],["Lilas","Syringa vulgaris",0,"j"],["Lavande","Lavandula angustifolia",0,"j"],["Géranium","Pelargonium",0,"j"],["Bégonia","Begonia",0,"j"],["Pétunia","Petunia",0,"j"],["Souci","Calendula officinalis",0,"j"],["Œillet d’Inde","Tagetes erecta",0,"j"],["Zinnia","Zinnia elegans",0,"j"],["Cosmos","Cosmos bipinnatus",0,"j"],["Pensée","Viola × wittrockiana","Pansy","j"],["Glaïeul","Gladiolus",0,"j"],["Lupin","Lupinus polyphyllus",0,"j"],["Pied-d’alouette","Delphinium",0,"j"],["Rose trémière","Alcea rosea",0,"j"],["Capucine","Tropaeolum majus",0,"j"],["Pois de senteur","Lathyrus odoratus",0,"j"],["Glycine","Wisteria sinensis",0,"j"],["Clématite","Clematis",0,"j"],["Fuchsia","Fuchsia",0,"j"],["Gueule-de-loup","Antirrhinum majus",0,"j"],["Échinacée","Echinacea purpurea",0,"j"],["Rudbeckie","Rudbeckia hirta",0,"j"],["Hémérocalle","Hemerocallis fulva",0,"j"],["Agapanthe","Agapanthus praecox",0,"j"],["Phlox","Phlox paniculata",0,"j"],["Impatiente","Impatiens walleriana",0,"j"],["Pourpier","Portulaca grandiflora",0,"j"],["Sauge écarlate","Salvia splendens",0,"j"],["Gypsophile","Gypsophila paniculata",0,"j"],["Monarde","Monarda didyma",0,"j"],["Tritoma","Kniphofia uvaria",0,"j"],["Ancolie","Aquilegia vulgaris",0,"j"],["Camélia","Camellia japonica",0,"j"],["Magnolia","Magnolia grandiflora",0,"j"],["Rhododendron","Rhododendron",0,"j"],["Gerbera","Gerbera",0,"j"],["Alstroemère","Alstroemeria",0,"j"],["Lys","Lilium",0,"j"],["Lis tigré","Lilium lancifolium",0,"j"],["Iris","Iris germanica",0,"j"],["Jasmin","Jasminum officinale",0,"j"],["Pavot de Californie","Eschscholzia californica",0,"j"],["Ipomée","Ipomoea purpurea",0,"j"],["Ail d’ornement","Allium giganteum",0,"j"],["Tournesol","Helianthus annuus",0,"j"],["Fleur de cerisier","Prunus serrulata","Cherry blossom","j"],
+["Tulipe","Tulipa",0,"b"],["Jonquille","Narcissus pseudonarcissus",0,"b"],["Jacinthe","Hyacinthus orientalis",0,"b"],["Crocus","Crocus vernus",0,"b"],["Perce-neige","Galanthus nivalis",0,"b"],["Muscari","Muscari armeniacum",0,"b"],["Fritillaire impériale","Fritillaria imperialis",0,"b"],["Anémone","Anemone coronaria",0,"b"],["Renoncule","Ranunculus asiaticus",0,"b"],["Freesia","Freesia",0,"b"],["Amaryllis","Hippeastrum",0,"b"],["Muguet","Convallaria majalis",0,"b"],["Cyclamen","Cyclamen persicum",0,"b"],["Rose de Noël","Helleborus niger",0,"b"],["Primevère","Primula vulgaris",0,"b"],
+["Marguerite","Leucanthemum vulgare",0,"s"],["Coquelicot","Papaver rhoeas",0,"s"],["Bleuet","Centaurea cyanus",0,"s"],["Pissenlit","Taraxacum officinale",0,"s"],["Pâquerette","Bellis perennis",0,"s"],["Trèfle rouge","Trifolium pratense",0,"s"],["Bouton d’or","Ranunculus acris",0,"s"],["Achillée millefeuille","Achillea millefolium",0,"s"],["Myosotis","Myosotis sylvatica",0,"s"],["Violette odorante","Viola odorata",0,"s"],["Digitale pourpre","Digitalis purpurea",0,"s"],["Trille grandiflore","Trillium grandiflorum",0,"s"],["Iris versicolore","Iris versicolor",0,"s"],["Sabot de la Vierge","Cypripedium acaule",0,"s"],["Edelweiss","Leontopodium nivale",0,"s"],["Gentiane","Gentiana acaulis",0,"s"],["Bruyère","Calluna vulgaris",0,"s"],["Épilobe","Chamaenerion angustifolium",0,"s"],["Verge d’or","Solidago canadensis",0,"s"],["Chicorée sauvage","Cichorium intybus",0,"s"],["Nénuphar blanc","Nymphaea alba",0,"s"],
+["Orchidée papillon","Phalaenopsis",0,"e"],["Hibiscus","Hibiscus rosa-sinensis",0,"e"],["Bougainvillier","Bougainvillea",0,"e"],["Oiseau de paradis","Strelitzia reginae",0,"e"],["Protéa royale","Protea cynaroides",0,"e"],["Arum","Zantedeschia aethiopica",0,"e"],["Anthurium","Anthurium andraeanum",0,"e"],["Frangipanier","Plumeria rubra",0,"e"],["Gardénia","Gardenia jasminoides",0,"e"],["Passiflore","Passiflora caerulea",0,"e"],["Lotus sacré","Nelumbo nucifera",0,"e"],["Mimosa","Acacia dealbata",0,"e"]
+];
+
+
+const QUIZZES = {
+  fish:    {name:"Poissons", ask:"Quel est ce poisson ?", list:FISH},
+  flowers: {name:"Fleurs",   ask:"Quelle est cette fleur ?", list:FLOWERS}
+};
+const LENGTHS = [10, 25, 100];
+const PHOTO_CACHE = "photos-v1";
+const app = document.getElementById("app");
+
+/* ——— Stockage ——— */
+function load(key, fallback){ try{ const v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; }catch(e){ return fallback; } }
+function save(key, value){ try{ localStorage.setItem(key, JSON.stringify(value)); }catch(e){} }
+let photos = load("cdo-photos", {});      // titre Wikipédia → URL de la photo
+let records = load("cdo-records", {});    // records[quiz][longueur]
+let cachedCount = 0;
+
+const titleOf = s => s[2] || s[1];
+const urlOf = s => photos[titleOf(s)] || null;
+const allSpecies = () => [...FISH, ...FLOWERS];
+const esc = t => String(t).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const shuffle = a => { a = a.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; };
+
+/* ——— Photos : recherche sur Wikipédia puis mise en cache ——— */
+async function resolvePhotos(){
+  const missing = allSpecies().map(titleOf).filter(t => !photos[t]);
+  for(let i=0; i<missing.length; i+=45){
+    const chunk = missing.slice(i, i+45);
+    const url = "https://en.wikipedia.org/w/api.php?action=query&format=json&formatversion=2&origin=*&redirects=1"
+      + "&prop=pageimages&piprop=thumbnail&pithumbsize=500&titles=" + encodeURIComponent(chunk.join("|"));
+    const data = await (await fetch(url)).json();
+    const q = data.query || {};
+    const step = {};
+    (q.normalized||[]).forEach(n => step[n.from] = n.to);
+    (q.redirects||[]).forEach(r => step[r.from] = r.to);
+    const byTitle = {};
+    (q.pages||[]).forEach(p => { if(p.thumbnail) byTitle[p.title] = p.thumbnail.source; });
+    chunk.forEach(t => {
+      let cur = t, guard = 0;
+      while(step[cur] && guard++ < 4) cur = step[cur];
+      if(byTitle[cur]) photos[t] = byTitle[cur];
+    });
+    save("cdo-photos", photos);
+  }
+}
+
+async function countCached(){
+  if(!("caches" in window)) return 0;
+  try{
+    const cache = await caches.open(PHOTO_CACHE);
+    const keys = new Set((await cache.keys()).map(r => r.url));
+    return Object.values(photos).filter(u => keys.has(u)).length;
+  }catch(e){ return 0; }
+}
+
+let downloading = false;
+async function downloadAll(){
+  if(downloading) return;
+  downloading = true;
+  const status = document.querySelector("[data-status]");
+  const bar = document.querySelector(".bar i");
+  const say = t => { if(status) status.textContent = t; };
+  try{
+    say("Recherche des photos…");
+    await resolvePhotos();
+    const urls = [...new Set(Object.values(photos))];
+    const cache = await caches.open(PHOTO_CACHE);
+    const have = new Set((await cache.keys()).map(r => r.url));
+    let done = urls.filter(u => have.has(u)).length;
+    const todo = urls.filter(u => !have.has(u));
+    const tick = () => { say(`Téléchargement : ${done} sur ${urls.length}`); if(bar) bar.style.width = (done/urls.length*100)+"%"; };
+    tick();
+    let idx = 0;
+    async function worker(){
+      while(idx < todo.length){
+        const u = todo[idx++];
+        try{ const r = await fetch(u, {mode:"cors"}); if(r.ok){ await cache.put(u, r); } }catch(e){}
+        done++; tick();
+      }
+    }
+    await Promise.all([worker(),worker(),worker(),worker(),worker()]);
+  }catch(e){
+    say("Le téléchargement a échoué. Vérifie ta connexion et réessaie.");
+    downloading = false;
+    return;
+  }
+  downloading = false;
+  cachedCount = await countCached();
+  renderHome();
+}
+
+/* ——— Accueil ——— */
+function bestFor(qid){
+  const r = records[qid] || {};
+  let best = null;
+  LENGTHS.forEach(n => { if(r[n] && r[n].plays){ if(!best || n > best.n) best = {n, s:r[n].best}; } });
+  return best;
+}
+
+function renderHome(openId){
+  const total = allSpecies().length;
+  const known = Object.keys(photos).length;
+  const ready = cachedCount >= known && known > 0;
+  const shelf = Object.entries(QUIZZES).map(([id,q]) => {
+    const withPhoto = q.list.filter(urlOf);
+    const peek = withPhoto.length ? urlOf(withPhoto[Math.floor(Math.random()*withPhoto.length)]) : "";
+    const best = bestFor(id);
+    const sub = best ? `${q.list.length} espèces. Record : <b>${best.s} sur ${best.n}</b>` : `${q.list.length} espèces`;
+    return `<li class="${openId===id?"open":""}" data-id="${id}">
+      <button class="vol" data-open="${id}" aria-expanded="${openId===id}">
+        <span><span class="vol-name">${q.name}</span><span class="vol-sub">${sub}</span></span>
+        <img class="peek ${peek?"":"empty"}" src="${esc(peek)}" alt="">
+      </button>
+      <div class="lengths">
+        <p>Combien de questions ?</p>
+        <div class="len-row">${LENGTHS.map((n,i) => `<button class="len ${i===0?"main":""}" data-start="${id}" data-n="${n}">${n===q.list.length?"Les "+n:n}</button>`).join("")}</div>
+      </div>
+    </li>`;
+  }).join("");
+
+  let offline;
+  if(ready){
+    offline = `<div class="offline"><strong>Prêt hors ligne</strong>${cachedCount} photos sont enregistrées sur ton téléphone.</div>`;
+  }else{
+    offline = `<div class="offline"><strong>Photos à télécharger</strong><span data-status>Une seule fois, avec le wifi : environ 8 Mo. Ensuite, l’app marche sans connexion.</span>
+      <div class="bar"><i style="width:${known?cachedCount/known*100:0}%"></i></div>
+      <button class="dl" data-dl>Télécharger les photos</button></div>`;
+  }
+
+  app.innerHTML = `
+    <header class="mast"><h1>Coup d’œil</h1><p>Une photo, cinq noms. Trouve le bon.</p></header>
+    <ul class="shelf">${shelf}</ul>
+    <div class="foot">${offline}<button class="link" data-records>Voir mes records</button></div>`;
+}
+
+/* ——— Partie ——— */
+let game = null;
+
+function startGame(qid, n){
+  const q = QUIZZES[qid];
+  const pool = q.list.filter(urlOf);
+  if(pool.length < 5){
+    alert("Télécharge d’abord les photos depuis l’accueil (avec une connexion internet).");
+    return;
+  }
+  const picks = shuffle(pool).slice(0, Math.min(n, pool.length));
+  const rounds = picks.map(sp => {
+    const same = shuffle(pool.filter(s => s !== sp && s[3] === sp[3]));
+    const other = shuffle(pool.filter(s => s !== sp && s[3] !== sp[3]));
+    const wrong = [...same.slice(0,3), ...other].filter((v,i,a)=>a.indexOf(v)===i).slice(0,4);
+    return {sp, options: shuffle([sp, ...wrong]), picked:null};
+  });
+  game = {qid, n, rounds, i:0, score:0, streak:0, bestStreak:0};
+  renderRound();
+}
+
+function preload(i){
+  const r = game.rounds[i];
+  if(r){ const im = new Image(); im.src = urlOf(r.sp); }
+}
+
+function renderRound(){
+  const g = game, r = g.rounds[g.i], q = QUIZZES[g.qid];
+  const answered = r.picked !== null;
+  const correct = answered && r.picked === r.sp;
+  const choices = r.options.map((o,k) => {
+    let cls = "choice", mark = "";
+    if(answered){
+      if(o === r.sp){ cls += " right"; mark = "Bonne réponse"; }
+      else if(o === r.picked){ cls += " wrong"; mark = "Ton choix"; }
+      else cls += " dim";
+    }
+    return `<li><button class="${cls}" data-pick="${k}" ${answered?"disabled":""}><span>${esc(o[0])}</span><span class="mark">${mark}</span></button></li>`;
+  }).join("");
+
+  const line = answered
+    ? `<div class="reveal"><b>${esc(r.sp[0])}</b><i>${esc(r.sp[1])}</i></div><button class="next" data-next>${g.i === g.rounds.length-1 ? "Voir le score" : "Suivante"}</button>`
+    : `<p class="ask">${q.ask}</p>`;
+
+  app.innerHTML = `<div class="play">
+    <div class="top"><button class="quit" data-quit>Quitter</button>
+      <span>${g.streak>=2?`<span class="streak">Série de ${g.streak}</span>`:""}<span class="count">${g.i+1} / ${g.rounds.length}</span></span></div>
+    <div class="progress"><i style="width:${(g.i + (answered?1:0))/g.rounds.length*100}%"></i></div>
+    <figure class="shot"><img alt="Photo à identifier" src="${esc(urlOf(r.sp))}"></figure>
+    <div class="line">${line}</div>
+    <ol class="choices">${choices}</ol>
+  </div>`;
+
+  const img = app.querySelector(".shot img");
+  const shown = () => img.classList.add("ok");
+  img.addEventListener("load", shown);
+  if(img.complete && img.naturalWidth) shown();
+  img.addEventListener("error", () => {
+    img.remove();
+    app.querySelector(".shot").insertAdjacentHTML("beforeend", `<div class="miss">Cette photo n’est pas encore sur ton téléphone. Reviens à l’accueil et télécharge les photos avec le wifi.</div>`);
+  });
+  preload(g.i + 1);
+}
+
+function pick(k){
+  const g = game, r = g.rounds[g.i];
+  if(r.picked !== null) return;
+  r.picked = r.options[k];
+  if(r.picked === r.sp){ g.score++; g.streak++; g.bestStreak = Math.max(g.bestStreak, g.streak); }
+  else g.streak = 0;
+  if(navigator.vibrate && r.picked !== r.sp) navigator.vibrate(30);
+  renderRound();
+}
+
+function next(){
+  if(game.i < game.rounds.length - 1){ game.i++; renderRound(); }
+  else finish();
+}
+
+function finish(){
+  const g = game;
+  const total = g.rounds.length;
+  records[g.qid] = records[g.qid] || {};
+  const rec = records[g.qid][g.n] || {best:0, bestStreak:0, plays:0, history:[]};
+  const isRecord = rec.plays > 0 && g.score > rec.best;
+  const first = rec.plays === 0;
+  const prevBest = rec.best;
+  rec.best = Math.max(rec.best, g.score);
+  rec.bestStreak = Math.max(rec.bestStreak, g.bestStreak);
+  rec.plays++;
+  rec.history = [{s:g.score, t:total, d:Date.now()}, ...rec.history].slice(0, 10);
+  records[g.qid][g.n] = rec;
+  save("cdo-records", records);
+
+  let verdict;
+  if(isRecord) verdict = `<b>Nouveau record.</b> L’ancien était ${prevBest}.`;
+  else if(first) verdict = `Premier score enregistré pour cette longueur.`;
+  else if(g.score === rec.best) verdict = `Tu égales ton record.`;
+  else verdict = `Ton record est de <b>${rec.best}</b>.`;
+  if(g.bestStreak >= 3) verdict += ` Meilleure série : ${g.bestStreak} d’affilée.`;
+
+  const missed = g.rounds.filter(r => r.picked !== r.sp);
+  const review = missed.length
+    ? `<ul>${missed.map(r => `<li><img src="${esc(urlOf(r.sp))}" alt=""><div><b>${esc(r.sp[0])}</b><span>Tu as répondu ${esc(r.picked[0])}</span></div></li>`).join("")}</ul>`
+    : `<p class="allgood">Aucune erreur.</p>`;
+
+  app.innerHTML = `<div class="result">
+    <div class="score">${g.score}</div>
+    <div class="score-of">sur ${total}</div>
+    <p class="verdict">${verdict}</p>
+    <div class="actions"><button class="main" data-again>Rejouer</button><button data-home>Accueil</button></div>
+    <div class="review"><h2>À revoir</h2>${review}</div>
+  </div>`;
+  window.scrollTo(0,0);
+}
+
+/* ——— Records ——— */
+function renderRecords(){
+  const blocks = Object.entries(QUIZZES).map(([id,q]) => {
+    const r = records[id] || {};
+    const rows = LENGTHS.map(n => {
+      const x = r[n];
+      return `<tr><td>${n} questions</td><td>${x?x.best:"–"}</td><td>${x?x.bestStreak:"–"}</td><td>${x?x.plays:0}</td></tr>`;
+    }).join("");
+    const last = LENGTHS.flatMap(n => (r[n]?.history||[])).sort((a,b)=>b.d-a.d).slice(0,5);
+    const hist = last.length ? `<p class="history">Dernières parties : ${last.map(h=>`${h.s}/${h.t}`).join(", ")}</p>` : "";
+    return `<section><h2>${q.name}</h2>
+      <table><thead><tr><th>Partie</th><th>Record</th><th>Série</th><th>Jouées</th></tr></thead><tbody>${rows}</tbody></table>${hist}</section>`;
+  }).join("");
+  app.innerHTML = `<div class="records"><button class="back" data-home>Retour</button><h1>Records</h1>${blocks}
+    <button class="reset" data-reset>Effacer tous les records</button></div>`;
+  window.scrollTo(0,0);
+}
+
+/* ——— Événements ——— */
+app.addEventListener("click", e => {
+  const t = e.target.closest("button");
+  if(!t) return;
+  if(t.dataset.open){
+    const li = t.closest("li");
+    renderHome(li.classList.contains("open") ? null : t.dataset.open);
+  }
+  else if(t.dataset.start) startGame(t.dataset.start, +t.dataset.n);
+  else if(t.dataset.pick !== undefined) pick(+t.dataset.pick);
+  else if("next" in t.dataset) next();
+  else if("quit" in t.dataset){ if(confirm("Quitter la partie ? Ce score ne sera pas enregistré.")) renderHome(); }
+  else if("again" in t.dataset) startGame(game.qid, game.n);
+  else if("home" in t.dataset){ renderHome(); window.scrollTo(0,0); }
+  else if("records" in t.dataset) renderRecords();
+  else if("reset" in t.dataset){ if(confirm("Effacer tous les records ?")){ records = {}; save("cdo-records", records); renderRecords(); } }
+  else if("dl" in t.dataset){ t.disabled = true; t.textContent = "En cours…"; downloadAll(); }
+});
+
+/* ——— Démarrage ——— */
+(async function init(){
+  if("serviceWorker" in navigator && location.protocol === "https:"){
+    try{ await navigator.serviceWorker.register("sw.js"); }catch(e){}
+  }
+  if(navigator.storage && navigator.storage.persist){ try{ navigator.storage.persist(); }catch(e){} }
+  cachedCount = await countCached();
+  renderHome();
+})();
+</script>
+</body>
+</html>
