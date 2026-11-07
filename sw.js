@@ -1,5 +1,5 @@
-// Coup d’œil : garde l’app et les photos sur le téléphone pour jouer sans connexion.
-const SHELL = "shell-v1";
+// Quizzes Marco : garde l’app et les photos sur le téléphone pour jouer sans connexion.
+const SHELL = "shell-v2";
 const PHOTOS = "photos-v1";
 const FILES = ["./", "./index.html", "./manifest.webmanifest", "./icon-180.png", "./icon-512.png"];
 
@@ -23,10 +23,10 @@ self.addEventListener("fetch", e => {
   // Photos : d’abord le cache, sinon internet (et on garde une copie).
   if (url.hostname === "upload.wikimedia.org") {
     e.respondWith(caches.open(PHOTOS).then(async c => {
-      const hit = await c.match(req.url);
+      const hit = await c.match(req.url, { ignoreVary: true });
       if (hit) return hit;
       const res = await fetch(req.url, { mode: "cors" });
-      if (res.ok) c.put(req.url, res.clone());
+      if (res.ok) { const blob = await res.clone().blob(); c.put(req.url, new Response(blob, { headers: { "Content-Type": blob.type || "image/jpeg" } })); }
       return res;
     }));
     return;
@@ -51,7 +51,7 @@ self.addEventListener("fetch", e => {
       fetch(req).then(res => {
         if (res.ok) caches.open(SHELL).then(c => c.put(req, res.clone()));
         return res;
-      }).catch(async () => (await caches.match(req)) || (await caches.match("./index.html")))
+      }).catch(async () => (await caches.match(req, { ignoreSearch: true })) || (await caches.match("./index.html")) || (await caches.match("./")))
     );
   }
 });

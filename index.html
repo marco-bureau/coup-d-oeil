@@ -3,11 +3,11 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Coup d’œil</title>
+<title>Quizzes Marco</title>
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="Coup d’œil">
+<meta name="apple-mobile-web-app-title" content="Quizzes Marco">
 <meta name="theme-color" content="#F3F5EF" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#0F2B23" media="(prefers-color-scheme: dark)">
 <link rel="manifest" href="manifest.webmanifest">
@@ -45,9 +45,8 @@ button:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
 #app{max-width:560px;margin:0 auto;min-height:100%;padding:0 22px}
 
 /* ——— Accueil ——— */
-.mast{padding:44px 0 34px}
-.mast h1{font-family:var(--serif);font-weight:400;font-size:21px;letter-spacing:.01em}
-.mast p{color:var(--ink-soft);margin-top:4px;font-size:16px}
+.mast{padding:40px 0 28px}
+.mast h1{font-family:var(--serif);font-weight:400;font-size:24px;letter-spacing:.005em}
 
 .shelf{list-style:none;border-top:1.5px solid var(--ink)}
 .shelf>li{border-bottom:1px solid var(--line)}
@@ -73,7 +72,8 @@ button:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
 .dl{margin-top:12px;border:1.5px solid var(--ink);border-radius:999px;padding:11px 20px;font-weight:600;font-size:15px}
 .bar{height:3px;background:var(--line);margin-top:12px;border-radius:2px;overflow:hidden;max-width:280px}
 .bar i{display:block;height:100%;background:var(--ink);width:0;transition:width .2s}
-.link{align-self:flex-start;font-weight:600;font-size:15px;text-decoration:underline;text-underline-offset:4px;text-decoration-thickness:1.5px}
+.links{display:flex;flex-direction:column;align-items:flex-start;gap:14px}
+.link{font-weight:600;font-size:15px;text-decoration:underline;text-underline-offset:4px;text-decoration-thickness:1.5px}
 
 /* ——— Partie ——— */
 .play{display:flex;flex-direction:column;min-height:100vh;min-height:100dvh;padding-bottom:18px}
@@ -83,8 +83,7 @@ button:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
 .top .streak{color:var(--ink-soft);margin-right:14px;font-weight:400}
 .progress{height:2px;background:var(--line);margin-bottom:14px}
 .progress i{display:block;height:100%;background:var(--ink);transition:width .3s}
-.shot{position:relative;margin:0 -22px;height:min(44vh,400px);background:var(--wash);overflow:hidden}
-@media (min-width:600px){.shot{margin:0;border-radius:4px}}
+.shot{position:relative;height:min(31vh,280px);background:var(--wash);overflow:hidden;border-radius:4px}
 .shot img{width:100%;height:100%;object-fit:cover;display:block;opacity:0;transition:opacity .25s}
 .shot img.ok{opacity:1}
 .shot .miss{position:absolute;inset:0;display:grid;place-items:center;padding:24px;text-align:center;color:var(--ink-soft);font-size:15px}
@@ -133,6 +132,24 @@ button:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
 .history{margin-top:14px;font-size:14px;color:var(--ink-soft)}
 .reset{font-size:14px;color:var(--ink-soft);text-decoration:underline;text-underline-offset:3px}
 
+/* ——— Galerie ——— */
+.gallery{padding:20px 0 44px}
+.gallery h1{font-family:var(--serif);font-weight:400;font-size:46px;letter-spacing:-.02em;margin-bottom:18px}
+.tabs{display:flex;gap:8px;margin-bottom:22px;position:sticky;top:env(safe-area-inset-top,0px);background:var(--paper);padding:10px 0;z-index:2}
+.tab{border:1.5px solid var(--ink);border-radius:999px;padding:9px 18px;font-weight:600;font-size:15px}
+.tab.on{background:var(--ink);color:var(--paper)}
+.grid{list-style:none;display:grid;grid-template-columns:repeat(2,1fr);gap:18px 12px}
+@media (min-width:480px){.grid{grid-template-columns:repeat(3,1fr)}}
+.grid button{width:100%;text-align:left;display:block}
+.grid img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:3px;background:var(--wash);display:block}
+.grid b{display:block;font-weight:600;font-size:15px;margin-top:7px;line-height:1.25}
+.grid i{display:block;font-size:13px;color:var(--ink-soft);line-height:1.3}
+.zoom{position:fixed;inset:0;z-index:10;background:var(--paper);display:flex;flex-direction:column;justify-content:center;padding:calc(env(safe-area-inset-top,0px) + 20px) 22px calc(env(safe-area-inset-bottom,0px) + 20px)}
+.zoom img{width:100%;max-height:70vh;object-fit:contain;display:block}
+.zoom b{font-family:var(--serif);font-weight:400;font-size:28px;display:block;margin-top:18px}
+.zoom i{color:var(--ink-soft)}
+.zoom p{margin-top:22px;font-size:14px;color:var(--ink-soft)}
+
 @media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
@@ -176,6 +193,27 @@ const urlOf = s => photos[titleOf(s)] || null;
 const allSpecies = () => [...FISH, ...FLOWERS];
 const esc = t => String(t).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const shuffle = a => { a = a.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; };
+
+/* ——— Photos lues depuis la mémoire du téléphone ——— */
+const blobUrls = new Map();
+async function srcFor(url){
+  if(!url) return "";
+  if(blobUrls.has(url)) return blobUrls.get(url);
+  if("caches" in window){
+    try{
+      const cache = await caches.open(PHOTO_CACHE);
+      const hit = await cache.match(url, {ignoreVary:true, ignoreSearch:false});
+      if(hit){ const u = URL.createObjectURL(await hit.blob()); blobUrls.set(url, u); return u; }
+    }catch(e){}
+  }
+  return url;
+}
+function hydrate(root){
+  (root||app).querySelectorAll("img[data-src]").forEach(async img => {
+    const u = img.dataset.src; img.removeAttribute("data-src");
+    img.src = await srcFor(u);
+  });
+}
 
 /* ——— Photos : recherche sur Wikipédia puis mise en cache ——— */
 async function resolvePhotos(){
@@ -230,7 +268,7 @@ async function downloadAll(){
     async function worker(){
       while(idx < todo.length){
         const u = todo[idx++];
-        try{ const r = await fetch(u, {mode:"cors"}); if(r.ok){ await cache.put(u, r); } }catch(e){}
+        try{ const r = await fetch(u, {mode:"cors"}); if(r.ok){ const blob = await r.blob(); await cache.put(u, new Response(blob, {headers:{"Content-Type": blob.type || "image/jpeg"}})); } }catch(e){}
         done++; tick();
       }
     }
@@ -265,7 +303,7 @@ function renderHome(openId){
     return `<li class="${openId===id?"open":""}" data-id="${id}">
       <button class="vol" data-open="${id}" aria-expanded="${openId===id}">
         <span><span class="vol-name">${q.name}</span><span class="vol-sub">${sub}</span></span>
-        <img class="peek ${peek?"":"empty"}" src="${esc(peek)}" alt="">
+        <img class="peek ${peek?"":"empty"}" data-src="${esc(peek)}" alt="">
       </button>
       <div class="lengths">
         <p>Combien de questions ?</p>
@@ -284,9 +322,10 @@ function renderHome(openId){
   }
 
   app.innerHTML = `
-    <header class="mast"><h1>Coup d’œil</h1><p>Une photo, cinq noms. Trouve le bon.</p></header>
+    <header class="mast"><h1>Quizzes Marco</h1></header>
     <ul class="shelf">${shelf}</ul>
-    <div class="foot">${offline}<button class="link" data-records>Voir mes records</button></div>`;
+    <div class="foot">${offline}<div class="links"><button class="link" data-gallery>Voir toutes les photos</button><button class="link" data-records>Voir mes records</button></div></div>`;
+  hydrate();
 }
 
 /* ——— Partie ——— */
@@ -312,7 +351,7 @@ function startGame(qid, n){
 
 function preload(i){
   const r = game.rounds[i];
-  if(r){ const im = new Image(); im.src = urlOf(r.sp); }
+  if(r) srcFor(urlOf(r.sp));
 }
 
 function renderRound(){
@@ -337,7 +376,7 @@ function renderRound(){
     <div class="top"><button class="quit" data-quit>Quitter</button>
       <span>${g.streak>=2?`<span class="streak">Série de ${g.streak}</span>`:""}<span class="count">${g.i+1} / ${g.rounds.length}</span></span></div>
     <div class="progress"><i style="width:${(g.i + (answered?1:0))/g.rounds.length*100}%"></i></div>
-    <figure class="shot"><img alt="Photo à identifier" src="${esc(urlOf(r.sp))}"></figure>
+    <figure class="shot"><img alt="Photo à identifier"></figure>
     <div class="line">${line}</div>
     <ol class="choices">${choices}</ol>
   </div>`;
@@ -347,9 +386,11 @@ function renderRound(){
   img.addEventListener("load", shown);
   if(img.complete && img.naturalWidth) shown();
   img.addEventListener("error", () => {
+    if(!img.isConnected) return;
     img.remove();
     app.querySelector(".shot").insertAdjacentHTML("beforeend", `<div class="miss">Cette photo n’est pas encore sur ton téléphone. Reviens à l’accueil et télécharge les photos avec le wifi.</div>`);
   });
+  srcFor(urlOf(r.sp)).then(u => { img.src = u; });
   preload(g.i + 1);
 }
 
@@ -392,7 +433,7 @@ function finish(){
 
   const missed = g.rounds.filter(r => r.picked !== r.sp);
   const review = missed.length
-    ? `<ul>${missed.map(r => `<li><img src="${esc(urlOf(r.sp))}" alt=""><div><b>${esc(r.sp[0])}</b><span>Tu as répondu ${esc(r.picked[0])}</span></div></li>`).join("")}</ul>`
+    ? `<ul>${missed.map(r => `<li><img data-src="${esc(urlOf(r.sp))}" alt=""><div><b>${esc(r.sp[0])}</b><span>Tu as répondu ${esc(r.picked[0])}</span></div></li>`).join("")}</ul>`
     : `<p class="allgood">Aucune erreur.</p>`;
 
   app.innerHTML = `<div class="result">
@@ -402,7 +443,30 @@ function finish(){
     <div class="actions"><button class="main" data-again>Rejouer</button><button data-home>Accueil</button></div>
     <div class="review"><h2>À revoir</h2>${review}</div>
   </div>`;
+  hydrate();
   window.scrollTo(0,0);
+}
+
+/* ——— Galerie ——— */
+let galleryTab = "fish";
+function renderGallery(){
+  const q = QUIZZES[galleryTab];
+  const items = q.list.map((s,k) => urlOf(s)
+    ? `<li><button data-zoom="${k}"><img data-src="${esc(urlOf(s))}" alt="${esc(s[0])}" loading="lazy"><b>${esc(s[0])}</b><i>${esc(s[1])}</i></button></li>`
+    : `<li><img alt=""><b>${esc(s[0])}</b><i>${esc(s[1])}</i></li>`).join("");
+  app.innerHTML = `<div class="gallery"><button class="back" data-home>Retour</button><h1>Toutes les photos</h1>
+    <div class="tabs">${Object.entries(QUIZZES).map(([id,x]) => `<button class="tab ${id===galleryTab?"on":""}" data-tab="${id}">${x.name}</button>`).join("")}</div>
+    <ul class="grid">${items}</ul></div>`;
+  hydrate();
+}
+function zoom(k){
+  const s = QUIZZES[galleryTab].list[k];
+  const el = document.createElement("div");
+  el.className = "zoom"; el.setAttribute("role","dialog");
+  el.innerHTML = `<img data-src="${esc(urlOf(s))}" alt="${esc(s[0])}"><b>${esc(s[0])}</b><i>${esc(s[1])}</i><p>Touche n’importe où pour fermer.</p>`;
+  el.addEventListener("click", () => el.remove());
+  document.body.appendChild(el);
+  hydrate(el);
 }
 
 /* ——— Records ——— */
@@ -438,13 +502,16 @@ app.addEventListener("click", e => {
   else if("again" in t.dataset) startGame(game.qid, game.n);
   else if("home" in t.dataset){ renderHome(); window.scrollTo(0,0); }
   else if("records" in t.dataset) renderRecords();
+  else if("gallery" in t.dataset){ renderGallery(); window.scrollTo(0,0); }
+  else if(t.dataset.tab){ galleryTab = t.dataset.tab; renderGallery(); window.scrollTo(0,0); }
+  else if(t.dataset.zoom !== undefined) zoom(+t.dataset.zoom);
   else if("reset" in t.dataset){ if(confirm("Effacer tous les records ?")){ records = {}; save("cdo-records", records); renderRecords(); } }
   else if("dl" in t.dataset){ t.disabled = true; t.textContent = "En cours…"; downloadAll(); }
 });
 
 /* ——— Démarrage ——— */
 (async function init(){
-  if("serviceWorker" in navigator && location.protocol === "https:"){
+  if("serviceWorker" in navigator && (location.protocol === "https:" || location.hostname === "localhost")){
     try{ await navigator.serviceWorker.register("sw.js"); }catch(e){}
   }
   if(navigator.storage && navigator.storage.persist){ try{ navigator.storage.persist(); }catch(e){} }
